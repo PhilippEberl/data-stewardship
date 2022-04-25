@@ -1,0 +1,591 @@
+\documentclass{beamer}
+
+%\usepackage{beamerthemesplit} // Activate for custom appearance
+\usepackage{hyperref}
+\usecolortheme{seahorse}
+
+\addtobeamertemplate{navigation symbols}{}{
+    \usebeamerfont{footline}
+    \usebeamercolor[fg]{footline}
+    \hspace{1em}
+    \insertframenumber/\inserttotalframenumber
+}
+
+\setbeamercolor{footline}{fg=blue}
+\setbeamerfont{footline}{series=\bfseries}
+
+\title{Exercise 2}
+\author{Christof Pegrisch, Simon König, Philipp Eberl}
+\date{\today}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Table of Contents}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%% Datasets
+\section{Datasets}
+\frame
+{
+  \frametitle{Dataset 1: Solar flares}
+
+  \begin{itemize}
+    \item Devided into two sections, one with more error correction
+    \item 10 Attributes
+    \item 1389 Instances
+    \item No missing values
+    \item Instances describe state of certain region of the sun
+    \item \url{https://archive-beta.ics.uci.edu/ml/datasets/solar+flare}
+  \end{itemize}
+}
+
+\frame
+{
+  \frametitle{Dataset 2: Wine quality}
+
+  \begin{itemize}
+    \item Two seperate files for red and white wine
+    \item Information about wine like citric acid or residual sugar
+    \item 12 attributes each
+    \item 4898 instances for white wine
+    \item 1599 instances for red wine
+    \item No missing values
+    \item \url{https://www.kaggle.com/brendan45774/wine-quality?select=winequality-red.csv}
+  \end{itemize}
+}
+
+\frame
+{
+  \frametitle{Dataset 3: Coronavirus}
+
+  \begin{itemize}
+    \item Dataset with population and vaccination data of countries
+    \item 10 attributes
+    \item About 24.000 instances with different timestamps
+    \item No missing values
+    \item \url{https://www.kaggle.com/sinakaraji/covid-vaccination-vs-death/activity}
+  \end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%% Preprocessing
+\section{Preprocessing}
+\frame
+{
+  \frametitle{What has been done}
+  \begin{itemize}
+    \item Solar flares
+    \begin{itemize}
+      \item Converting to numeric\\ (requirement of used implementations)
+      \item One hot encoding (for region class, largest spot and spot distribution)
+    \end{itemize}
+    \item Wine quality
+    \begin{itemize}
+      \item Converting to numeric
+    \end{itemize}
+    \item Coronavirus
+    \begin{itemize}
+      \item Converting to numeric
+      \item Normalizaton by dividing through population\\ (eg ratio of people vaccinated)
+      \item One hot encoding (for country names)
+    \end{itemize}
+  \end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%% Approach
+\section{Approach}
+
+\frame
+{
+  \frametitle{General Idea}
+
+  \begin{itemize}
+    \item Implementation of both hillclimbing and simulated annealing due to their similarities.
+    \item Simulated annealing for:
+      \begin{itemize}
+        \item Solar flares
+        \item Wine white
+        \item Wine red
+      \end{itemize}
+    \item Hillclimbing for:
+      \begin{itemize}
+        \item Covid \\ (due to the size of the dataset and shorter runtime of hillclimbing)
+      \end{itemize}
+  \end{itemize}
+}
+
+\frame
+{
+  \frametitle{Used Algorithms}
+
+  \begin{itemize}
+    \item Hillclimbing
+      (finds local maximum by searching the immediate neighborhood)
+      \begin{itemize}
+        \item Starts with a random set of hyperparameters
+        \item Searches close neighborhood for better solution and keeps it
+        \item Repeats until no solution in the neighborhood is better than the current
+      \end{itemize}
+
+    \item Simulated annealing
+      (tries to break out of local minima using probabilities)
+      \begin{itemize}
+        \item Starts with a random set of hyperparameters
+        \item Takes random solution from the close neighborhood
+        \item Keeps the new solution according to a certain probabilty dependent on the quality and a decreasing temperature value
+        \item Repeats until either no changes occure for a certain amount of epochs or until a maximum number of epochs is reached
+      \end{itemize}
+  \end{itemize}
+}
+
+\frame
+{
+  \frametitle{Chosen Regressors}
+
+  \begin{itemize}
+    \item Linear SVR\\
+    \url{https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVR.html\#sklearn.svm.LinearSVR}
+    \item K-Neighbours Regressor\\
+    \url{https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsRegressor.html}
+    \item DecisionTree Regressor\\
+    \url{https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html}
+  \end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%% Implementation
+\section{Implementation}
+\frame
+{
+  \frametitle{Linear SVR}
+  Super vector regression using a linear kernel. By allowing an error in the model a
+  support vector regressor finds the optimal hyperplane to fit the data.
+
+  \begin{itemize}
+    \item Strengths: Effective for high dimensional feature spaces, memory efficient
+    \item Weaknesses: Not suitable for large datasets, hard to understand paramter selection (Black Box)
+  \end{itemize}
+}
+
+\frame
+{
+  \frametitle{K-Neighbours Regressor}
+  Uses K-nearest-neighbours algorithm to perform classification. To make a prediction the regressor takes the mean of k nearest neighbours.
+  \begin{itemize}
+    \item Strengths: Effective for large datasets, robust to noisy data, fast model building (Lazy learner)
+    \item Weaknesses: Prediction is computationally costly, hard to determine which attributes contribute to regression
+  \end{itemize}}
+
+\frame
+{
+  \frametitle{DecisionTree Regressor}
+  Builds a decision tree with real values as leave nodes. In the model building process mean squared error is used to split node in sub-nodes.
+  \begin{itemize}
+    \item Strengths: Easy to interpret and visualise, little influence by outliers, useful in data exploration
+    \item Weaknesses: Cannot extrapolate, tends to overfit
+  \end{itemize}}
+
+%%%%%%%%%%%%%%%%%%%%%%% Evaluation metrics
+\section{Evaluation metrics}
+\frame
+{
+  \frametitle{Sklearn metrics}
+
+  \begin{itemize}
+  \item Negative Mean squared error
+    \begin{itemize}
+      \item Describes how close a regression line is to a specific set of points. Lower scores indicate a better fit
+    \end{itemize}
+  \item $R^{2}$ score
+    \begin{itemize}
+      \item R-squared explains to what extent the variance of one variable explains the variance of the second variable. Best result is 1.0, which means all of the variation can be explained by the models inputs.
+    \end{itemize}
+  \end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%% Results own implementation
+\section{Results using own implementation}
+\frame
+{
+  \frametitle{Linear SVR}
+
+  \begin{itemize}
+    \item Covid dataset
+    \begin{itemize}
+      \item Result negative MSE: $-1822.8864578877833$
+      \item Hyperparameters: (loss="epsilon\_insensitive", tol=1e-5, C=10, epsilon=1e-3)
+      \item Result $R^{2}$: $-1.6148099403159493$
+      \item Hyperparameters: (loss="epsilon\_insensitive", tol=1e-5, C=1e-4, epsilon=1)
+    \end{itemize}
+    \item Red wine dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.651999565611231$
+      \item Hyperparameters: (loss="epsilon\_insensitive", tol=1e-5, C=1e-4, epsilon=1e-3)
+      \item Result $R^{2}$: $0.19967708634304884$
+      \item Hyperparameters: (loss="epsilon\_insensitive", tol=1e-3, C=1e-2, epsilon=1)
+    \end{itemize}
+  \end{itemize}
+}
+
+\frame
+{
+  \frametitle{Linear SVR}
+
+  \begin{itemize}
+    \item White wine dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.9578209077406313$
+      \item Hyperparameters: (loss="epsilon\_insensitive", tol=1e-5, C=1, epsilon=1)
+      \item Result $R^{2}$: $0.19560956565824933$
+      \item Hyperparameters: (loss="epsilon\_insensitive", tol=1e-5, C=1e-2, epsilon=1e-3)
+    \end{itemize}
+    \item Solar flares dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.5772637203438242$
+      \item Hyperparameters: (loss="epsilon\_insensitive", tol=1e-1, C=10, epsilon=1e-1)
+      \item Result $R^{2}$: $0.010585959265640965$
+      \item Hyperparameters: (loss="epsilon\_insensitive", tol=1e-5, C=1e-2, epsilon=1e-1)
+    \end{itemize}
+  \end{itemize}
+}
+
+\frame
+{
+  \frametitle{K-Neighbours Regressor}
+
+  \begin{itemize}
+    \item Covid dataset
+    \begin{itemize}
+      \item Result negative MSE: $-528.5757039291524$
+      \item Hyperparameters: (n\_neighbors=4, weights="uniform", p:2)
+      \item Result $R^{2}$: $0.23799133614878842$
+      \item Hyperparameters: (n\_neighbors=10, weights="distance", p=1)
+    \end{itemize}
+    \item Red wine dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.5745512186731103$
+      \item Hyperparameters: (n\_neighbors=10, weights="distance", p=1)
+      \item Result $R^{2}$: $0.029412732130088725$
+      \item Hyperparameters: (n\_neighbors=6, weights="distance", p=1)
+    \end{itemize}
+  \end{itemize}
+}
+
+\frame
+{
+  \frametitle{K-Neighbours Regressor}
+
+  \begin{itemize}
+    \item White wine dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.7485020711918213$
+      \item Hyperparameters: (n\_neighbors=7, weights="uniform", p=1)
+      \item Result $R^{2}$: $0.01870206497013156$
+      \item Hyperparameters: (n\_neighbors=6, weights="uniform", p=1)
+    \end{itemize}
+    \item Solar flares dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.614328428953588$
+      \item Hyperparameters: (n\_neighbors=4, weights="uniform", p=2)
+      \item Result $R^{2}$: $-0.06532347561422938$
+      \item Hyperparameters: (n\_neighbors=9, weights="uniform", p=1)
+    \end{itemize}
+  \end{itemize}
+}
+
+\frame
+{
+  \frametitle{Decision Tree Regressor}
+
+  \begin{itemize}
+    \item Covid dataset
+    \begin{itemize}
+      \item Result negative MSE: $-47.644739644785794$
+      \item Hyperparameters: (max\_depth=2, min\_samples\_split=5, min\_samples\_leaf=6)
+      \item Result $R^{2}$: $0.9914236829965463$
+      \item Hyperparameters: (max\_depth=4, min\_samples\_split=10, min\_samples\_leaf=2)
+    \end{itemize}
+    \item Red wine dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.4948440103954347$
+      \item Hyperparameters: (max\_depth=6, min\_samples\_split=10, min\_samples\_leaf=10)
+      \item Result $R^{2}$: $0.2015905613389884$
+      \item Hyperparameters: (max\_depth=6, min\_samples\_split=10, min\_samples\_leaf=10)
+    \end{itemize}
+  \end{itemize}
+}
+
+\frame
+{
+  \frametitle{Decision Tree Regressor}
+
+  \begin{itemize}
+    \item White wine dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.5860529460556473$
+      \item Hyperparameters: (max\_depth=5, min\_samples\_split=7, min\_samples\_leaf=4)
+      \item Result $R^{2}$: $0.2402569677761802$
+      \item Hyperparameters: (max\_depth=4, min\_samples\_split=2, min\_samples\_leaf=10)
+    \end{itemize}
+    \item Solar flares dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.576831949429341$
+      \item Hyperparameters: (max\_depth=9, min\_samples\_split=6, min\_samples\_leaf=10)
+      \item Result $R^{2}$: $-0.2005731727387947$
+      \item Hyperparameters: (max\_depth=4, min\_samples\_split=3, min\_samples\_leaf=9)
+    \end{itemize}
+  \end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%% Results AutoML TPOT
+\section{Results using AutoML (TPOT)}
+\frame
+{
+  \frametitle{Linear SVR}
+
+  \begin{itemize}
+    \item Covid dataset
+    \begin{itemize}
+      \item Result negative MSE: $-676.798302552437$
+      \item Hyperparameters: (loss="squared\_epsilon\_insensitive", tol=1e-05, C=1, epsilon=1)
+      \item Result $R^{2}$: $0.03303043368725276$
+      \item Hyperparameters: (loss="squared\_epsilon\_insensitive", tol=1e-05, C=20, epsilon=1)
+    \end{itemize}
+    \item Red wine dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.4336334344973999$
+      \item Hyperparameters: (loss="squared\_epsilon\_insensitive", tol=1e-05, C=20, epsilon=0.001)
+      \item Result $R^{2}$: $0.3260756862051558$
+      \item Hyperparameters: (loss="squared\_epsilon\_insensitive", tol=1e-05, C=1, epsilon=0.001)
+    \end{itemize}
+  \end{itemize}
+}
+
+\frame
+{
+  \frametitle{Linear SVR}
+
+  \begin{itemize}
+    \item White wine dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.5781509600594222$
+      \item Hyperparameters: (loss="squared\_epsilon\_insensitive", tol=1e-05, C=1, epsilon=0.1)
+      \item Result $R^{2}$: $0.27084918178993517$
+      \item Hyperparameters: (loss="squared\_epsilon\_insensitive", tol=1e-05, C=20, epsilon=0.001)
+    \end{itemize}
+    \item Solar flares dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.5342683423739354$
+      \item Hyperparameters: (loss="squared\_epsilon\_insensitive", tol=0.1, C=0.01, epsilon=0.001)
+      \item Result $R^{2}$: $0.15284999357211257$
+      \item Hyperparameters: (loss="squared\_epsilon\_insensitive", tol=0.001, C=0.01, epsilon=0.001)
+    \end{itemize}
+  \end{itemize}
+}
+
+\frame
+{
+  \frametitle{K-Neighbours Regressor}
+
+  \begin{itemize}
+    \item Covid dataset
+    \begin{itemize}
+      \item Result negative MSE: $-183.02381848495688$
+      \item Hyperparameters: (n\_neighbors=2, weights="distance", p=2)
+      \item Result $R^{2}$: $0.7384318978131217$
+      \item Hyperparameters: (n\_neighbors=2, weights="distance", p=2)
+    \end{itemize}
+    \item Red wine dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.4736539716577819$
+      \item Hyperparameters: (n\_neighbors=9, weights="distance", p=1)
+      \item Result $R^{2}$: $0.26291900754678466$
+      \item Hyperparameters: (n\_neighbors=9, weights="distance", p=1)
+    \end{itemize}
+  \end{itemize}
+}
+
+\frame
+{
+  \frametitle{K-Neighbours Regressor}
+
+  \begin{itemize}
+    \item White wine dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.5383166244166239$
+      \item Hyperparameters: (n\_neighbors=9, weights="distance", p=1)
+      \item Result $R^{2}$: $0.321785064120657$
+      \item Hyperparameters: (n\_neighbors=9, weights="distance", p=1)
+    \end{itemize}
+    \item Solar flares dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.5606531262445241$
+      \item Hyperparameters: (n\_neighbors=9, weights="uniform", p=1)
+      \item Result $R^{2}$: $0.11782061039157306$
+      \item Hyperparameters: (n\_neighbors=9, weights="uniform", p=1)
+    \end{itemize}
+  \end{itemize}
+}
+
+\frame
+{
+  \frametitle{Decision Tree Regressor}
+
+  \begin{itemize}
+    \item Covid dataset
+    \begin{itemize}
+      \item Result negative MSE: $-15.57304409288794$
+      \item Hyperparameters: (max\_depth=9, min\_samples\_split=8, min\_samples\_leaf=4)
+      \item Result $R^{2}$: $0.973973891378282$
+      \item Hyperparameters: (max\_depth=9, min\_samples\_split=9, min\_samples\_leaf=8)
+    \end{itemize}
+    \item Red wine dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.45011627543766675$
+      \item Hyperparameters: (max\_depth=4, min\_samples\_split=4, min\_samples\_leaf=8)
+      \item Result $R^{2}$: $0.29964107282339586$
+      \item Hyperparameters: (max\_depth=4, min\_samples\_split=8, min\_samples\_leaf=9)
+    \end{itemize}
+  \end{itemize}
+}
+
+\frame
+{
+  \frametitle{Decision Tree Regressor}
+
+  \begin{itemize}
+    \item White wine dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.5801390660131089$
+      \item Hyperparameters: (max\_depth=5, min\_samples\_split=2, min\_samples\_leaf=8)
+      \item Result $R^{2}$: $0.2673631830667058$
+      \item Hyperparameters: (max\_depth=4, min\_samples\_split=4, min\_samples\_leaf=8)
+    \end{itemize}
+    \item Solar flares dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.5529494224260217$
+      \item Hyperparameters: (max\_depth=2, min\_samples\_split=8, min\_samples\_leaf=7)
+      \item Result $R^{2}$: $0.12554988981936674$
+      \item Hyperparameters: (max\_depth=1, min\_samples\_split=9, min\_samples\_leaf=7)
+    \end{itemize}
+  \end{itemize}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%% Results AutoML Hyperopt-sklearn
+\section{Results using AutoML (Hyperopt-sklearn)}
+\frame
+{
+  \frametitle{Linear SVR}
+
+  \begin{itemize}
+    \item Covid dataset
+    \begin{itemize}
+      \item Result negative MSE: $-1343.9272236143343$
+      \item Result $R^{2}$: $-0.975865899654315$
+      \item Hyperparameters: ('learner': SVR(C=6.14430240999864e-05, cache\_size=512, degree=1,
+      epsilon=471.85790078465106, gamma='auto', kernel='linear',
+      max\_iter=84056886.0, tol=0.00019776043393699547), 'preprocs': (), 'ex\_preprocs': ())
+    \end{itemize}
+    \item Red wine dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.47382854090840987$
+      \item Result $R^{2}$: $0.23298333807017352$
+      \item Hyperparameters: ('learner': SVR(C=0.021658668215710258, cache\_size=512, degree=1,
+      epsilon=0.5767107013240668, gamma='auto', kernel='linear',
+      max\_iter=814470115.0, tol=4.057465654030927e-05), 'preprocs': (), 'ex\_preprocs': ())
+    \end{itemize}
+  \end{itemize}
+}
+
+\frame
+{
+  \frametitle{Linear SVR}
+
+  \begin{itemize}
+    \item White wine dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.7742476360259494$
+      \item Result $R^{2}$: $0.0030735412517071347$
+      \item Hyperparameters: ('learner': SVR(C=9.231350836902164e-05, cache\_size=512, degree=1,
+      epsilon=0.003526261250305432, gamma='auto', kernel='linear',
+      max\_iter=450281484.0, tol=0.007903935921111719), 'preprocs': (), 'ex\_preprocs': ())
+    \end{itemize}
+    \item Solar flares dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.6209445377362287$
+      \item Result $R^{2}$: $-0.21250010342979167$
+      \item Hyperparameters: ('learner': SVR(C=0.011018759854312025, cache\_size=512, degree=1,
+      epsilon=0.4722286042118413, gamma='auto', kernel='linear',
+      max\_iter=422105859.0, shrinking=False, tol=4.828809035580296e-05), 'preprocs': (), 'ex\_preprocs': ())
+    \end{itemize}
+  \end{itemize}
+}
+
+\frame
+{
+  \frametitle{K-Neighbours Regressor}
+
+  \begin{itemize}
+    \item Covid dataset
+    \begin{itemize}
+      \item Result negative MSE: $-447.24793185054614$
+      \item Result $R^{2}$: $0.35903633021606923$
+      \item Hyperparameters:('learner': KNeighborsRegressor(metric='euclidean', n\_jobs=1, n\_neighbors=23), 'preprocs': (), 'ex\_preprocs': ())
+    \end{itemize}
+    \item Red wine dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.5461105011420537$
+      \item Result $R^{2}$: $0.12185830259391994$
+      \item Hyperparameters: ('learner': KNeighborsRegressor(metric='manhattan', n\_jobs=1, n\_neighbors=22, p=1,
+      weights='distance'), 'preprocs': (), 'ex\_preprocs': ())
+    \end{itemize}
+  \end{itemize}
+}
+
+\frame
+{
+  \frametitle{K-Neighbours Regressor}
+
+  \begin{itemize}
+    \item White wine dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.6911960646052259$
+      \item Result $R^{2}$: $0.1087286219856329$
+      \item Hyperparameters: ('learner': KNeighborsRegressor(metric='euclidean', n\_jobs=1, n\_neighbors=34,
+      weights='distance'), 'preprocs': (), 'ex\_preprocs': ())
+    \end{itemize}
+    \item Solar flares dataset
+    \begin{itemize}
+      \item Result negative MSE: $-0.5189269288987464$
+      \item Result $R^{2}$: $0.02340265519013567$
+      \item Hyperparameters: ('learner': KNeighborsRegressor(metric='euclidean', n\_jobs=1, n\_neighbors=44), 'preprocs': (), 'ex\_preprocs': ())
+    \end{itemize}
+  \end{itemize}
+}
+
+\frame
+{
+  \frametitle{Decision Tree Regressor}
+
+  \begin{itemize}
+    \item Decision Tree Regressor could not be tested for Hyperopt-sklearn since it is not yet implemented according to its github page.\\
+    \url{https://github.com/hyperopt/hyperopt-sklearn}
+  \end{itemize}
+}
+
+\section{Conclusion}
+\frame
+{
+  \frametitle{Interpretation and comparison of results}
+
+  \begin{itemize}
+    \item The experiments have shown that both implemented AutoML algorithms performed very well, finding better sets of hyperparameters than they started with. They could however not reach the quality of the hyperparameter-sets of existing implementations. Especially TPOT performed extremely well, outperforming every other algorithm in almost every test. 
+  \end{itemize}
+}
+
+\end{document}
