@@ -8,6 +8,14 @@ Github issue: <https://github.com/hyperopt/hyperopt-sklearn/issues/185>
 
 An update to fix this issue should be released in the next 48h as of the developes (27/4/2022).
 
+## Requirements
+
+Python was used in v3.9 for this experiment.
+
+All notebooks depend on libraries in their most recent version available. They can be found under *requirements.txt* To install all requirements in your virtual environment run
+
+`pip install -r requirements.txt`
+
 ---
 
 ## How to run each notebook
@@ -17,6 +25,8 @@ In order to run each notebook, one can simply open it in VS Code and select at t
 ---
 
 ## Preprocessing
+
+All `.csv`, `.data` and `.name` files for each data set have been preprocessed.
 
 The following preprocessing steps have been applied (see **preprocessing.ipynb**):
 
@@ -30,29 +40,19 @@ The following preprocessing steps have been applied (see **preprocessing.ipynb**
 * Wine quality
   * Conversion to numeric
 
-All notebooks depend on the following libraries in their most recent version available:
-
-Python was used in v3.9 for this experiment.
-
-* sklearn
-* random
-* numpy
-* datetime
-* io
-* hyperopt
-* hpsklearn
-
 Used Algorithms (Hillclimbing and simulated anealing) as well as used Regressors (linear SVR, KNN and DecisionTree) will not be explained in this experiment.
 
 ---
 
 ## Detailed information on data sets
 
+There are three data sets for this experiment. They are provided in the repository so all Jupyter notebooks work without any adaptions. You can also download the raw data from the sources provided below.
+
 ### *Covid vaccination vs. mortality*
 
 **Abstract**: This data set shows the ratio between vaccinated people (partially and fully) and new occured deaths.
 
-The COVID data set has the following 10 columns in the .csv file
+The COVID data set has the following 10 columns in the `.csv` file
 
 1. id
 2. country
@@ -92,7 +92,9 @@ From all these predictors three classes of flares are predicted, which are repre
 
 ### *Wine quality*
 
-**Abstract**: Two datasets are included, related to red and white vinho verde wine samples, from the north of Portugal. The goal is to model wine quality based on physicochemical tests
+**Abstract**: Two datasets are included, related to red and white vinho verde wine samples, from the north of Portugal. The goal is to model wine quality based on physicochemical tests. Both files are available as `.csv`.
+
+Number of Instances: red wine - 1599; white wine - 4898.
 
 Input variables (based on physicochemical tests):
 
@@ -112,11 +114,11 @@ Output variable (based on sensory data):
 
 12. quality (score between 0 and 10)
 
-### Sources for data sets
-
-* <https://www.kaggle.com/sinakaraji/covid-vaccination-vs-death/activity>
-* <http://archive.ics.uci.edu/ml/datasets/solar+flare>
-* <https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/>
+> ### Sources for data sets
+>
+> * <https://www.kaggle.com/sinakaraji/covid-vaccination-vs-death/activity>
+> * <http://archive.ics.uci.edu/ml/datasets/solar+flare>
+> * <https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/>
 
 ---
 
@@ -126,3 +128,20 @@ Output variable (based on sensory data):
   * Describes how close a regression line is to a specific set of points. Lower scores indicate a better fit.
 * R<sup>2</sup>
   * R-squared explains to what extent the variance of one variable explains the variance of the second variable. Best result is 1.0, which means all of the variation can be explained by the models inputs.
+
+> For more information on the metrics used see:
+>
+> * <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.mean_squared_error.html>
+> * <https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html>
+
+---
+
+## Output
+
+### Raw output
+
+Each notebook calculates the negative mean squared error and the R<sup>2</sup> score. They are both displayed for each data set, algorithm and regressor.
+
+### Plots
+
+Furthermore plots should help to visualize the difference in results and help to compare the better. Plots are generated at the very bottom of all notebooks and are not exported.
