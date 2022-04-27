@@ -2,9 +2,33 @@
 
 This experiment compares the performance between AutoML, hillclimbing and simulated annealing. In order to compare the results the Negative Mean Squarred Error (NMSE) and R<sup>2</sup> score are calculated and displayed.
 
-## ERROR: There is currently an issue open on GitHub of hyperopt-sklearn where the module **hpsklearn.estimator** is not available. This is an issue from their side thus all hyperopt notebooks cannot be compiled
+**There is currently an issue open on GitHub of hyperopt-sklearn where the module hpsklearn.estimator is not recognized on import. This is an issue from their side thus all hyperopt notebooks cannot be compiled.**
 
 Github issue: <https://github.com/hyperopt/hyperopt-sklearn/issues/185>
+
+An update to fix this issue should be released in the next 48h as of the developes (27/4/2022).
+
+---
+
+## How to run each notebook
+
+In order to run each notebook, one can simply open it in VS Code and select at the top of the notebook *Run All*.
+
+---
+
+## Preprocessing
+
+The following preprocessing steps have been applied (see **preprocessing.ipynb**):
+
+* Covid vaccination vs. mortality
+  * Conversion to numeric
+  * Normalization by dividing through population (e.g. ration of people vaccinated)
+  * One hot encoding for country names
+* Solar flares
+  * Conversion to numeric
+  * One hot encoding for region class, largest spot and spot distribution
+* Wine quality
+  * Conversion to numeric
 
 All notebooks depend on the following libraries in their most recent version available:
 
@@ -18,9 +42,13 @@ Python was used in v3.9 for this experiment.
 * hyperopt
 * hpsklearn
 
+Used Algorithms (Hillclimbing and simulated anealing) as well as used Regressors (linear SVR, KNN and DecisionTree) will not be explained in this experiment.
+
+---
+
 ## Detailed information on data sets
 
-### Covid vaccination vs. mortality
+### *Covid vaccination vs. mortality*
 
 **Abstract**: This data set shows the ratio between vaccinated people (partially and fully) and new occured deaths.
 
@@ -37,7 +65,7 @@ The COVID data set has the following 10 columns in the .csv file
 9. population
 10. ratio
 
-### Solar flares
+### *Solar flares*
 
 **Abstract**: Each class attribute counts the number of solar flares of a certain class that occur in a 24 hour period
 
@@ -62,7 +90,7 @@ From all these predictors three classes of flares are predicted, which are repre
 12. M-class flares production by this region in the following 24 hours (moderate flares); Number
 13. X-class flares production by this region in the following 24 hours (severe flares); Number
 
-### Wine quality
+### *Wine quality*
 
 **Abstract**: Two datasets are included, related to red and white vinho verde wine samples, from the north of Portugal. The goal is to model wine quality based on physicochemical tests
 
@@ -89,3 +117,12 @@ Output variable (based on sensory data):
 * <https://www.kaggle.com/sinakaraji/covid-vaccination-vs-death/activity>
 * <http://archive.ics.uci.edu/ml/datasets/solar+flare>
 * <https://archive.ics.uci.edu/ml/machine-learning-databases/wine-quality/>
+
+---
+
+## Metrics used for evaluation
+
+* Negative Mean Squared Error
+  * Describes how close a regression line is to a specific set of points. Lower scores indicate a better fit.
+* R<sup>2</sup>
+  * R-squared explains to what extent the variance of one variable explains the variance of the second variable. Best result is 1.0, which means all of the variation can be explained by the models inputs.
