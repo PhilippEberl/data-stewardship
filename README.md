@@ -1,4 +1,4 @@
-# The following README describes the experiment in more detail
+# Performance comparisson between AutoML, Hillclimbing and Simulated Annealing
 
 This experiment compares the performance between AutoML, hillclimbing and simulated annealing. In order to compare the results the Negative Mean Squarred Error (NMSE) and R<sup>2</sup> score are calculated and displayed.
 
