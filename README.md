@@ -6,7 +6,7 @@ This experiment compares the performance between AutoML, hillclimbing and simula
 
 Github issue: <https://github.com/hyperopt/hyperopt-sklearn/issues/185>
 
-An update to fix this issue should be released in the next 48h as of the developes (27/4/2022).
+As per the developers, a fix is underway.
 
 ## Requirements
 
